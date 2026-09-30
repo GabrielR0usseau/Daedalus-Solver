@@ -26,7 +26,7 @@ async function processPath(pPath) {
     });
 
     if (response.status === 429) {
-        const retryIn = response.headers.get('x-retry-in');
+        const retryIn = response.headers.get('x-retry-in') ?? 50;
         const delayMs = parseInt(retryIn, 10);
         await wait(delayMs);
         return processPath(pPath);
