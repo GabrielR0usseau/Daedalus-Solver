@@ -4,6 +4,7 @@ const { setTimeout: wait } = require('timers/promises');
 
 
 const queue = new Set();
+const SIMULTANEOUS_REQS = 4;
 const DIRS = ['l', 'u', 'r', 'd'];
 const REVERSED_DIRS = {
     'l': 'r',
@@ -40,7 +41,7 @@ async function processPath(pPath) {
     else if (!htmlResponse.includes('BONK!')) {
         console.log();
         console.log(`EXIT FOUND! At: '${pPath}'`);
-        return;
+        return true;
     }
 
     return false;
@@ -64,16 +65,25 @@ async function solve() {
 
     queuePush('');
 
+    const queueIterator = queue.values();
     let index = 0;
+
     while (index < queue.size) {
 
-        const currentPath = [...queue][index];
+        const batch = [];
 
-        if (await processPath(currentPath)) {
-            break;
+        for (let i = 0; i < SIMULTANEOUS_REQS && index < queue.size; i++) {
+            const currentPath = queueIterator.next().value;
+            batch.push(processPath(currentPath));
+            index++;
         }
 
-        index++;
+        const results = await Promise.all(batch);
+
+        if (results.includes(true)) {
+            break;
+        }
+        
     }
 
     console.log();
