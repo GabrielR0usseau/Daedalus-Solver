@@ -88,7 +88,7 @@ async function solve() {
 
     console.log();
     console.log(`STATS`);
-    console.log(`Took: ${((Date.now() - startTime) / 1000).toFixed(2)} seconds`);
+    console.log(`Took: ${((Date.now() - startTime) / 1000 / 60).toFixed(2)} minutes`);
     console.log(`Iterations: ${index.toLocaleString('en-US')}`);
     console.log(`Queue size: ${queue.size.toLocaleString('en-US') }`);
 }
