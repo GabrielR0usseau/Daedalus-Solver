@@ -136,8 +136,16 @@ async function processPath(pPath) {
         queuePush(pPath);
     }
     else if (!htmlResponse.includes('BONK!')) {
+        // Mark as visited
+        const coords = getCoords(pPath);
         const formattedCoords = `${coords.x}, ${coords.y}`;
         visitedCoords.add(formattedCoords);
+        mappedCoords[formattedCoords] = { ...coords, value: 2};
+
+        const unpairCoords = getCoords(pPath.substring(0, pPath.length - 1));
+        const formattedUnpairCoords = `${unpairCoords.x}, ${unpairCoords.y}`;
+        visitedCoords.add(formattedUnpairCoords);
+        mappedCoords[formattedUnpairCoords] = { ...unpairCoords, value: 1};
     }
 
     return false;
@@ -185,16 +193,7 @@ async function solve() {
         console.log(`\n${divider}\n`);
         console.log(`TIME\n${String(minsPast).padStart(2, '0')}:${String(secsPast).padStart(2, '0')}`);
         console.log(`\n${divider}\n`);
-        console.log(`ITERATIONS\n${index.toLocaleString('en-US')}`);
-        console.log(`\n${divider}\n`);
-        console.log(`COORDS\n${formattedCoords}`);
-        console.log(`\n${divider}\n`);
-        console.log(`PATH LENGTH\n${currentPath.length.toLocaleString('en-US')}`);
-        console.log(`\n${divider}\n`);
-        console.log(`PATH\n${currentPath}`);
-        console.log(`\n${divider}\n`);
         console.log(consoleMaze);
-        console.log(`\n${divider}\n`);
         
         await processPath(currentPath);
         index++;
