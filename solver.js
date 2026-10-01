@@ -54,7 +54,7 @@ function queuePush(pPath) {
 
     for (const dir of DIRS) {
         if (REVERSED_DIRS[dir] === lastDir) continue;
-        queue.add(pPath + dir);
+        queue.add(pPath + dir + dir); // Maze always has pairs
     }
 }
 
@@ -90,7 +90,6 @@ async function solve() {
     console.log(`STATS`);
     console.log(`Took: ${((Date.now() - startTime) / 1000 / 60).toFixed(2)} minutes`);
     console.log(`Iterations: ${index.toLocaleString('en-US')}`);
-    console.log(`Queue size: ${queue.size.toLocaleString('en-US') }`);
 }
 
 
