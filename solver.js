@@ -41,8 +41,7 @@ async function processPath(pPath) {
         queuePush(pPath);
     }
     else if (!htmlResponse.includes('BONK!')) {
-        console.log();
-        console.log(`EXIT FOUND! At: '${pPath}'`);
+        console.log(`EXIT FOUND!`);
         return true;
     }
 
