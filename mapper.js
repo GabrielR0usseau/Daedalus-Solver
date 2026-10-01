@@ -60,11 +60,17 @@ function displayMaze() {
             const coordsKey = `${x}, ${y}`;
             const cell = mappedCoords[coordsKey];
             if (cell) {
-                if (cell.value === 3) {
-                    generatedDisplay += '\x1b[34m██\x1b[0m';
-                }
-                else if (cell.value === 2) {
+                // Exit
+                if (cell.value === 4) {
                     generatedDisplay += '\x1b[32m██\x1b[0m';
+                }
+                // Secrets
+                else if (cell.value === 3) {
+                    generatedDisplay += '\x1b[38;5;208m██\x1b[0m';
+                }
+                // Spawn
+                else if (cell.value === 2) {
+                    generatedDisplay += '\x1b[34m██\x1b[0m';
                 }
                 else {
                     generatedDisplay += '██';
@@ -119,13 +125,21 @@ async function processPath(pPath) {
 
     const htmlResponse = await response.text();
 
-    if (htmlResponse.includes('Ça avance bien!')) {
-
+    if (!htmlResponse.includes('BONK!')) {
         // Mark as visited
         const coords = getCoords(pPath);
         const formattedCoords = `${coords.x}, ${coords.y}`;
         visitedCoords.add(formattedCoords);
-        mappedCoords[formattedCoords] = { ...coords, value: 1};
+
+        if (htmlResponse.includes('Ça avance bien!')) {
+            mappedCoords[formattedCoords] = { ...coords, value: 1};
+        }
+        else if (htmlResponse.includes('CEM')) {
+            mappedCoords[formattedCoords] = { ...coords, value: 4};
+        }
+        else {
+            mappedCoords[formattedCoords] = { ...coords, value: 3};
+        }
 
         const unpairCoords = getCoords(pPath.substring(0, pPath.length - 1));
         const formattedUnpairCoords = `${unpairCoords.x}, ${unpairCoords.y}`;
@@ -135,21 +149,10 @@ async function processPath(pPath) {
         // Queue new paths
         queuePush(pPath);
     }
-    else if (!htmlResponse.includes('BONK!')) {
-        // Mark as visited
-        const coords = getCoords(pPath);
-        const formattedCoords = `${coords.x}, ${coords.y}`;
-        visitedCoords.add(formattedCoords);
-        mappedCoords[formattedCoords] = { ...coords, value: 2};
-
-        const unpairCoords = getCoords(pPath.substring(0, pPath.length - 1));
-        const formattedUnpairCoords = `${unpairCoords.x}, ${unpairCoords.y}`;
-        visitedCoords.add(formattedUnpairCoords);
-        mappedCoords[formattedUnpairCoords] = { ...unpairCoords, value: 1};
-    }
 
     return false;
 }
+
 
 
 function queuePush(pPath) {
@@ -167,7 +170,7 @@ async function solve() {
 
     const startTime = Date.now();
 
-    mappedCoords[`0, 0`] = { x: 0, y: 0, value: 3};
+    mappedCoords[`0, 0`] = { x: 0, y: 0, value: 2};
     queuePush('');
 
     let index = 0;
