@@ -1,10 +1,13 @@
 
 const { setTimeout: wait } = require('timers/promises');
 
+const fs = require('fs');
+
+const logo = fs.readFileSync('./logo.txt', 'utf8');
+
 
 
 const queue = new Set();
-const SIMULTANEOUS_REQS = 4;
 const DIRS = ['l', 'u', 'r', 'd'];
 const REVERSED_DIRS = {
     'l': 'r',
@@ -18,7 +21,6 @@ const REVERSED_DIRS = {
 async function processPath(pPath) {
 
     const encodedPath = btoa(pPath);
-    console.log(encodedPath);
 
     const response = await fetch("https://daedalus.pobrillant.org/move", {
         headers: {
@@ -70,26 +72,24 @@ async function solve() {
 
     while (index < queue.size) {
 
-        const batch = [];
+        const currentPath = queueIterator.next().value;
 
-        for (let i = 0; i < SIMULTANEOUS_REQS && index < queue.size; i++) {
-            const currentPath = queueIterator.next().value;
-            batch.push(processPath(currentPath));
-            index++;
-        }
+        // Format time passed
+        const minsPast = Math.floor((Date.now() - startTime) / 1000 / 60);
+        const secsPast = Math.floor((Date.now() - startTime) / 1000 % 60);
 
-        const results = await Promise.all(batch);
 
-        if (results.includes(true)) {
-            break;
-        }
-        
+        console.clear();
+        console.log(`${logo}`);
+        console.log(`\nTime\n${String(minsPast).padStart(2, '0')}:${String(secsPast).padStart(2, '0')}`);
+        console.log(`\nIterations\n${index.toLocaleString('en-US')}`);
+        console.log(`\nCurrent Path Length\n${currentPath.length.toLocaleString('en-US')}`);
+        console.log(`\nCurrent Path\n${currentPath}`);
+
+        if (await processPath(currentPath)) break;
+        index++;
     }
-
-    console.log();
-    console.log(`STATS`);
-    console.log(`Took: ${((Date.now() - startTime) / 1000 / 60).toFixed(2)} minutes`);
-    console.log(`Iterations: ${index.toLocaleString('en-US')}`);
+    
 }
 
 
