@@ -79,7 +79,7 @@ async function processPath(pPath) {
         // Queue new paths
         queuePush(pPath);
     }
-    else if (!htmlResponse.includes('BONK!')) {
+    else if (htmlResponse.includes('CEM')) {
         console.log("EXIT FOUND!\n");
         fs.writeFileSync('solution.txt', pPath);
         return true;
