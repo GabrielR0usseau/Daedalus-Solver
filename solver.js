@@ -1,13 +1,13 @@
 
 const { setTimeout: wait } = require('timers/promises');
-
 const fs = require('fs');
 
-const logo = fs.readFileSync('./logo.txt', 'utf8');
+const logo = fs.readFileSync('./assets/logo.txt', 'utf8');
+const divider = fs.readFileSync('./assets/divider.txt', 'utf8');
 
 
 
-const queue = new Set();
+const queue = [];
 const DIRS = ['l', 'u', 'r', 'd'];
 const REVERSED_DIRS = {
     'l': 'r',
@@ -56,7 +56,7 @@ function queuePush(pPath) {
 
     for (const dir of DIRS) {
         if (REVERSED_DIRS[dir] === lastDir) continue;
-        queue.add(pPath + dir + dir); // Maze always has pairs
+        queue.push(pPath + dir + dir); // Maze always has pairs
     }
 }
 
@@ -67,12 +67,11 @@ async function solve() {
 
     queuePush('');
 
-    const queueIterator = queue.values();
     let index = 0;
 
-    while (index < queue.size) {
+    while (queue.length > 0) {
 
-        const currentPath = queueIterator.next().value;
+        const currentPath = queue.pop();
 
         // Format time passed
         const minsPast = Math.floor((Date.now() - startTime) / 1000 / 60);
@@ -80,11 +79,17 @@ async function solve() {
 
 
         console.clear();
+        console.log(`${divider}\n`);
         console.log(`${logo}`);
-        console.log(`\nTime\n${String(minsPast).padStart(2, '0')}:${String(secsPast).padStart(2, '0')}`);
-        console.log(`\nIterations\n${index.toLocaleString('en-US')}`);
-        console.log(`\nCurrent Path Length\n${currentPath.length.toLocaleString('en-US')}`);
-        console.log(`\nCurrent Path\n${currentPath}`);
+        console.log(`\n${divider}\n`);
+        console.log(`TIME\n${String(minsPast).padStart(2, '0')}:${String(secsPast).padStart(2, '0')}`);
+        console.log(`\n${divider}\n`);
+        console.log(`ITERATIONS\n${index.toLocaleString('en-US')}`);
+        console.log(`\n${divider}\n`);
+        console.log(`PATH LENGTH\n${currentPath.length.toLocaleString('en-US')}`);
+        console.log(`\n${divider}\n`);
+        console.log(`PATH\n${currentPath}`);
+        console.log(`\n${divider}\n`);
 
         if (await processPath(currentPath)) break;
         index++;
